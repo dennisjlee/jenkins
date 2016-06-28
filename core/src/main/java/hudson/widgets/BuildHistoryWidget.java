@@ -75,11 +75,7 @@ public class BuildHistoryWidget<T> extends HistoryWidget<Task,T> {
     public HistoryPageFilter getHistoryPageFilter() {
         final HistoryPageFilter<T> historyPageFilter = newPageFilter();
 
-        List<T> items = new LinkedList<T>();
-
-        items.addAll((Collection<? extends T>) getQueuedItems());
-        items.addAll(IteratorUtils.toList(baseList.iterator()));
-        historyPageFilter.add(items);
+        historyPageFilter.add(baseList, getQueuedItems());
         historyPageFilter.widget = this;
 
         return historyPageFilter;
