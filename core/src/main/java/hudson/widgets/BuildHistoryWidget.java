@@ -27,7 +27,7 @@ import jenkins.model.Jenkins;
 import hudson.model.Queue.Item;
 import hudson.model.Queue.Task;
 import jenkins.widgets.HistoryPageFilter;
-import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.collections4.IteratorUtils;
 
 import java.util.Collection;
 import java.util.LinkedList;
