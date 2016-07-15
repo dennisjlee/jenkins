@@ -29,6 +29,7 @@ import hudson.cli.CLICommand;
 import hudson.remoting.Callable;
 import hudson.remoting.Channel;
 import java.io.File;
+import java.io.NotSerializableException;
 import java.io.PrintStream;
 import jenkins.security.security218.Payload;
 import org.jenkinsci.remoting.RoleChecker;
@@ -57,9 +58,9 @@ public class Security218CliTest {
     @Test
     @Issue("SECURITY-218")
     public void probeCommonsCollections2() throws Exception {
-        // The issue with CommonsCollections2 does not appear in manual tests on Jenkins, but it may be a risk
-        // in newer commons-collections version => remoting implementation should filter this class anyway
-        probe(Payload.CommonsCollections2, PayloadCaller.EXIT_CODE_REJECTED);
+        // With commons-collections 4.1, the serialization bug has been removed by entirely
+        // disabling serialization of the classes that were vulnerable in older versions.
+        probe(Payload.CommonsCollections2, PayloadCaller.EXIT_CODE_NOT_SERIALIZABLE);
     }
     
     @PresetData(PresetData.DataSet.ANONYMOUS_READONLY)
@@ -127,6 +128,7 @@ public class Security218CliTest {
         public static final int EXIT_CODE_OK = 0;
         public static final int EXIT_CODE_REJECTED = 42;
         public static final int EXIT_CODE_ASSIGNMENT_ISSUE = 43;
+        public static final int EXIT_CODE_NOT_SERIALIZABLE = 44;
 
         public PayloadCaller(Payload payload, String command) {
             this.payload = payload;
@@ -169,6 +171,8 @@ public class Security218CliTest {
                         // Something wrong
                         throw ex;
                     }
+                } else if (cause instanceof NotSerializableException) {
+                    return PayloadCaller.EXIT_CODE_NOT_SERIALIZABLE;
                 }
 
                 final String message = cause.getMessage();
